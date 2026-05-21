@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMART-CAO | Hub Operacional - Centro de Comando</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #004d40;
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: #2e7d32;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        .alert {
+            background-color: #fee2e2;
+            color: #991b1b;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .button {
+            background-color: #2e7d32;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .button:hover {
+            background-color: #1b5e20;
+        }
+        .button-emergency {
+            background-color: #d32f2f;
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+        }
+        .button-emergency:hover {
+            background-color: #b71c1c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SMART-CAO | Hub Operacional - Centro de Comando</h1>
+        <p>Este documento contém o protótipo da interface do Hub Operacional para gestão e auditoria do ecossistema SMART-CAO.</p>
+        
+        <h2>Funcionalidades Principais</h2>
+        <ul>
+            <li>Painel de Controle com indicadores de NFTs emitidos, volume antecipado e alertas.</li>
+            <li>Fila de Validação para auditoria dos dados da Vision API.</li>
+            <li>Gestão de Risco e Alertas de Conformidade (CAR, Zarc, MCR).</li>
+            <li>Botão de Circuit Breaker para bloqueio emergencial.</li>
+            <li>Identificação do auditor responsável (Prof. Eduardo Palmeira).</li>
+        </ul>
+        
+        <h2>Exemplo de Alertas</h2>
+        <div class="alert">
+            <strong>Divergência de Coordenadas GPS:</strong> Token #CAB-089 com scan fora do polígono do CAR.
+        </div>
+        
+        <h2>Fila de Validação</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Token ID</th>
+                    <th>Farmer</th>
+                    <th>Status Vision API</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>#CAB-089</td>
+                    <td>João Silva</td>
+                    <td>Pendente</td>
+                    <td><button class="button">Revisar</button></td>
+                </tr>
+                <tr>
+                    <td>#CAB-090</td>
+                    <td>Maria Santos</td>
+                    <td>Pendente</td>
+                    <td><button class="button">Revisar</button></td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h2>Botão de Emergência</h2>
+        <button class="button button-emergency">🔴 CIRCUIT BREAKER</button>
+    </div>
+</body>
+</html>

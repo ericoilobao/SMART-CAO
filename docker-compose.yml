@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: smartcao-db
+    environment:
+      POSTGRES_DB: smartcao
+      POSTGRES_USER: smartcao
+      POSTGRES_PASSWORD: smartcao_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smartcao"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: smartcao-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: smartcao-backend
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://smartcao:smartcao_dev_password@postgres:5432/smartcao
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: dev_secret_key_change_in_production
+      PORT: 5000
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: npm run dev
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: smartcao-frontend
+    environment:
+      VITE_API_URL: http://localhost:5000/api
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev
+
+  # Hardhat Node (Local Blockchain)
+  hardhat:
+    build:
+      context: ./blockchain
+      dockerfile: Dockerfile
+    container_name: smartcao-hardhat
+    ports:
+      - "8545:8545"
+    volumes:
+      - ./blockchain:/app
+      - /app/node_modules
+    command: npx hardhat node
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  default:
+    name: smartcao-network

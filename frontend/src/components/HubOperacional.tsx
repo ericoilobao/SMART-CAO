@@ -1,163 +1,206 @@
 import React from 'react'
-import { AlertTriangle, CheckCircle, AlertCircle, Lock } from 'lucide-react'
+import { AlertTriangle, Shield, CheckCircle, AlertCircle, Zap, Lock } from 'lucide-react'
 
 function HubOperacional() {
   const [circuitBreakerActive, setCircuitBreakerActive] = React.useState(false)
+  const [validationQueue, setValidationQueue] = React.useState([
+    { id: 'VAL-001', token: 'CAB-089', farmer: 'João Silva', type: 'Validação GPS', status: 'Pendente', priority: 'Alta' },
+    { id: 'VAL-002', token: 'CAB-088', farmer: 'Maria Santos', type: 'Conferência CAR', status: 'Pendente', priority: 'Normal' },
+    { id: 'VAL-003', token: 'CAB-087', farmer: 'Pedro Oliveira', type: 'Validação Área', status: 'Processando', priority: 'Normal' },
+  ])
+
+  const systemStatus = {
+    blockchain: 'Operacional',
+    visionApi: 'Operacional',
+    database: 'Operacional',
+    redis: 'Operacional'
+  }
 
   const alerts = [
     {
-      type: 'error',
+      id: 1,
       title: 'Divergência de Coordenadas GPS',
       description: 'Token #CAB-089 com scan fora do polígono do CAR',
-      severity: 'Crítico'
+      type: 'critical',
+      timestamp: '2026-05-20 14:32'
     },
     {
+      id: 2,
+      title: 'Documentação Incompleta',
+      description: 'Agricultor #456 sem documentação ZARC',
       type: 'warning',
-      title: 'Validação Pendente',
-      description: 'Token #CAB-088 aguardando verificação de documentos',
-      severity: 'Alto'
+      timestamp: '2026-05-20 13:15'
     },
     {
-      type: 'info',
-      title: 'Certificação Vencida',
-      description: 'Token #CAB-076 com certificado ZARC expirado em 2025',
-      severity: 'Médio'
-    },
+      id: 3,
+      title: 'Taxa de Validação Baixa',
+      description: 'Vision API com acurácia em 87% (esperado >95%)',
+      type: 'warning',
+      timestamp: '2026-05-20 12:45'
+    }
   ]
 
-  const validationQueue = [
-    { id: 'CAB-090', farmer: 'Carlos Mendes', score: 89, status: 'Pronto' },
-    { id: 'CAB-089', farmer: 'João Silva', score: 45, status: 'Aguardando' },
-    { id: 'CAB-088', farmer: 'Maria Santos', score: 72, status: 'Revisão' },
-  ]
+  const handleCircuitBreaker = () => {
+    setCircuitBreakerActive(!circuitBreakerActive)
+  }
+
+  const handleApproveValidation = (id: string) => {
+    setValidationQueue(validationQueue.filter(v => v.id !== id))
+  }
 
   return (
     <div className="space-y-8">
-      {/* Circuit Breaker Alert */}
-      {circuitBreakerActive && (
-        <div className="bg-red-50 border-2 border-red-500 rounded-lg p-4 flex items-center space-x-4">
-          <Lock className="w-6 h-6 text-red-600 flex-shrink-0" />
-          <div className="flex-1">
-            <h3 className="font-bold text-red-900">CIRCUIT BREAKER ATIVADO</h3>
-            <p className="text-red-700 text-sm">Sistema em modo de emergência. Novas emissões bloqueadas.</p>
-          </div>
-          <button
-            onClick={() => setCircuitBreakerActive(false)}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded font-medium"
-          >
-            Desativar
-          </button>
-        </div>
-      )}
-
-      {/* System Status */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 text-green-600" />
-            </div>
-            <div>
-              <p className="text-gray-600 text-sm">Blockchain</p>
-              <p className="text-lg font-bold text-green-600">Operacional</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 text-green-600" />
-            </div>
-            <div>
-              <p className="text-gray-600 text-sm">Vision API</p>
-              <p className="text-lg font-bold text-green-600">Conectado</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-              <AlertCircle className="w-6 h-6 text-yellow-600" />
-            </div>
-            <div>
-              <p className="text-gray-600 text-sm">Database</p>
-              <p className="text-lg font-bold text-yellow-600">Alerta</p>
-            </div>
-          </div>
-        </div>
+      {/* Header */}
+      <div className="bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-lg p-8 shadow-lg">
+        <h2 className="text-3xl font-bold mb-2">Centro de Comando - Hub Operacional</h2>
+        <p className="text-green-100">Gestão e auditoria do ecossistema SMART-CAO</p>
+        <p className="text-green-100 text-sm mt-2">👤 Auditor Responsável: <strong>Prof. Eduardo Palmeira</strong></p>
       </div>
 
-      {/* Emergency Control */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Controle de Emergência</h3>
-        <div className="space-y-4">
-          <p className="text-gray-600 text-sm">
-            Auditor Responsável: <span className="font-bold text-gray-900">Prof. Eduardo Palmeira</span>
-          </p>
+      {/* Circuit Breaker */}
+      <div className={`rounded-lg shadow p-6 ${circuitBreakerActive ? 'bg-red-50 border-2 border-red-500' : 'bg-white'}`}>
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <Zap className="w-5 h-5 text-yellow-500" />
+              Circuit Breaker - Bloqueio Emergencial
+            </h3>
+            <p className="text-sm text-gray-600 mt-1">
+              {circuitBreakerActive 
+                ? '🔴 ATIVO - Sistema em bloqueio emergencial'
+                : '🟢 INATIVO - Sistema operando normalmente'}
+            </p>
+          </div>
           <button
-            onClick={() => setCircuitBreakerActive(!circuitBreakerActive)}
-            className={`w-full py-3 px-4 rounded-lg font-bold text-white transition ${
+            onClick={handleCircuitBreaker}
+            className={`px-6 py-3 rounded-lg font-bold transition flex items-center gap-2 ${
               circuitBreakerActive
-                ? 'bg-green-600 hover:bg-green-700'
-                : 'bg-red-600 hover:bg-red-700'
+                ? 'bg-green-500 hover:bg-green-600 text-white'
+                : 'bg-red-500 hover:bg-red-600 text-white'
             }`}
           >
-            {circuitBreakerActive ? '✓ DESATIVAR CIRCUIT BREAKER' : '⚠ ATIVAR CIRCUIT BREAKER'}
+            {circuitBreakerActive ? (
+              <>
+                <Lock className="w-5 h-5" />
+                Desativar
+              </>
+            ) : (
+              <>
+                <Lock className="w-5 h-5" />
+                Ativar
+              </>
+            )}
           </button>
-          <p className="text-xs text-gray-500">
-            Clique para {circuitBreakerActive ? 'retomar' : 'bloquear'} operações do sistema em caso de emergência
-          </p>
+        </div>
+        {circuitBreakerActive && (
+          <div className="mt-4 p-3 bg-red-100 border border-red-300 rounded text-red-800 text-sm">
+            ⚠️ <strong>Aviso:</strong> O Circuit Breaker está ativo. Todas as operações de minting e emissão de tokens foram bloqueadas.
+          </div>
+        )}
+      </div>
+
+      {/* System Status */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {Object.entries(systemStatus).map(([service, status]) => (
+          <div key={service} className="bg-white rounded-lg shadow p-4">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-600 text-sm capitalize">{service.replace(/([A-Z])/g, ' $1')}</span>
+              <div className="flex items-center gap-1">
+                <CheckCircle className="w-5 h-5 text-green-500" />
+                <span className="text-xs font-medium text-green-600">Operacional</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Alerts */}
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 text-red-500" />
+            Alertas de Conformidade
+          </h3>
+        </div>
+        <div className="divide-y divide-gray-200">
+          {alerts.map((alert) => (
+            <div key={alert.id} className={`p-6 ${alert.type === 'critical' ? 'bg-red-50' : 'bg-yellow-50'}`}>
+              <div className="flex items-start gap-4">
+                <div className={`p-2 rounded-lg ${alert.type === 'critical' ? 'bg-red-100' : 'bg-yellow-100'}`}>
+                  {alert.type === 'critical' ? (
+                    <AlertTriangle className="w-5 h-5 text-red-600" />
+                  ) : (
+                    <AlertCircle className="w-5 h-5 text-yellow-600" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-gray-900">{alert.title}</p>
+                  <p className="text-gray-600 text-sm mt-1">{alert.description}</p>
+                  <p className="text-gray-500 text-xs mt-2">{alert.timestamp}</p>
+                </div>
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                  alert.type === 'critical' ? 'bg-red-200 text-red-800' : 'bg-yellow-200 text-yellow-800'
+                }`}>
+                  {alert.type === 'critical' ? 'Crítico' : 'Aviso'}
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Validation Queue */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Fila de Validação (Vision API)</h3>
+        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+            <Shield className="w-5 h-5 text-blue-500" />
+            Fila de Validação - Vision API
+          </h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID Validação</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Token</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Agricultor</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Score IA</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prioridade</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ação</th>
               </tr>
             </thead>
             <tbody>
-              {validationQueue.map((item, index) => (
-                <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
-                  <td className="px-6 py-4 text-sm font-medium text-green-600">{item.id}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{item.farmer}</td>
+              {validationQueue.map((item) => (
+                <tr key={item.id} className="border-b border-gray-200 hover:bg-gray-50">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.id}</td>
+                  <td className="px-6 py-4 text-sm text-blue-600">{item.token}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{item.farmer}</td>
+                  <td className="px-6 py-4 text-sm text-gray-600">{item.type}</td>
                   <td className="px-6 py-4 text-sm">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-16 bg-gray-200 rounded-full h-2">
-                        <div
-                          className="bg-green-600 h-2 rounded-full"
-                          style={{ width: `${item.score}%` }}
-                        />
-                      </div>
-                      <span className="text-gray-900 font-medium">{item.score}%</span>
-                    </div>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      item.priority === 'Alta' 
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-blue-100 text-blue-800'
+                    }`}>
+                      {item.priority}
+                    </span>
                   </td>
                   <td className="px-6 py-4 text-sm">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        item.status === 'Pronto'
-                          ? 'bg-green-100 text-green-800'
-                          : item.status === 'Revisão'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-blue-100 text-blue-800'
-                      }`}
-                    >
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      item.status === 'Processando'
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}>
                       {item.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm">
-                    <button className="text-green-600 hover:text-green-800 font-medium">
-                      {item.status === 'Pronto' ? 'Liberar' : 'Revisar'}
+                    <button
+                      onClick={() => handleApproveValidation(item.id)}
+                      className="text-green-600 hover:text-green-900 font-medium"
+                    >
+                      Aprovar
                     </button>
                   </td>
                 </tr>
@@ -167,46 +210,16 @@ function HubOperacional() {
         </div>
       </div>
 
-      {/* Compliance Alerts */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Alertas de Conformidade</h3>
-          <p className="text-sm text-gray-600 mt-1">CAR, ZARC, MCR e validações regulatórias</p>
-        </div>
-        <div className="divide-y divide-gray-200">
-          {alerts.map((alert, index) => (
-            <div key={index} className="px-6 py-4">
-              <div className="flex items-start space-x-4">
-                <div className="flex-shrink-0">
-                  {alert.type === 'error' ? (
-                    <AlertTriangle className="w-6 h-6 text-red-600" />
-                  ) : alert.type === 'warning' ? (
-                    <AlertCircle className="w-6 h-6 text-yellow-600" />
-                  ) : (
-                    <AlertCircle className="w-6 h-6 text-blue-600" />
-                  )}
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-semibold text-gray-900">{alert.title}</h4>
-                  <p className="text-gray-600 text-sm mt-1">{alert.description}</p>
-                </div>
-                <div className="flex-shrink-0">
-                  <span
-                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                      alert.severity === 'Crítico'
-                        ? 'bg-red-100 text-red-800'
-                        : alert.severity === 'Alto'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-blue-100 text-blue-800'
-                    }`}
-                  >
-                    {alert.severity}
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+      {/* Information Box */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <h4 className="font-semibold text-blue-900 mb-2">ℹ️ Sobre o Hub Operacional</h4>
+        <ul className="text-blue-800 text-sm space-y-1">
+          <li>✓ Gerenciamento centralizado de todas as operações</li>
+          <li>✓ Monitoramento em tempo real de validações</li>
+          <li>✓ Controle de emergência (Circuit Breaker) para bloqueio rápido</li>
+          <li>✓ Alertas de conformidade com CAR, ZARC e MCR</li>
+          <li>✓ Auditoria completa por Prof. Eduardo Palmeira</li>
+        </ul>
       </div>
     </div>
   )
